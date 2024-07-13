@@ -11,7 +11,8 @@ pub struct LlmComponentDetection {
 
 impl Default for LlmComponentDetection {
   fn default() -> Self {
-    let llm = OpenAI::default().with_model(OpenAIModel::Gpt4o.to_string());
+    let llm = OpenAI::default()
+      .with_model(OpenAIModel::Gpt4o.to_string());
     let prompt = message_formatter![
         fmt_message!(Message::new_system_message(load_prompt("component_detection/system.txt"))),
         fmt_template!(HumanMessagePromptTemplate::new(template_fstring!(
@@ -29,7 +30,7 @@ impl Default for LlmComponentDetection {
 
 #[async_trait]
 impl ComponentionDetectionService for  LlmComponentDetection {
-  async fn detect_components(&self) -> Result<String, String> {
+  async fn detect_components(&self, base64_image: &str) -> Result<String, String> {
     match self.chain
       .invoke(prompt_args! {"input" => "Albert Einstein"})
       .await 
