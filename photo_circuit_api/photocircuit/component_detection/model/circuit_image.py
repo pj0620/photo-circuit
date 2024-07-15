@@ -7,8 +7,8 @@ from pydantic.v1 import BaseModel, Field
 class BBox(BaseModel):
   h: int = Field(description="height of bbox for component")
   w: int = Field(description="width of bbox for component")
-  x: int = Field(description="x location of bbox for component")
-  y: int = Field(description="y location of bbox for component")
+  x: int = Field(description="x location of top left point of bbox for component")
+  y: int = Field(description="y location of top left point of bbox for component")
 
 
 class ComponentName(Enum):
