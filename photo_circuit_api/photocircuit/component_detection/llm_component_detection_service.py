@@ -1,0 +1,33 @@
+from typing import Any
+
+from langchain.output_parsers import YamlOutputParser
+from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain_openai import ChatOpenAI
+
+from photocircuit.component_detection.base_component_detection_service import BaseComponentDetectionService
+from photocircuit.component_detection.model.circuit_image import CircuitComponents, CircuitComponentsLLM
+from photocircuit.utils.prompt_utils import load_prompt
+
+
+class LlmComponentDetectionService(BaseComponentDetectionService):
+  def __init__(self):
+    self.llm = ChatOpenAI(temperature=0, model="gpt-4o", max_tokens=1024)
+    self.parser = YamlOutputParser(pydantic_object=CircuitComponentsLLM)
+    self.format_instructions = self.parser.get_format_instructions()
+    self.system_prompt = load_prompt('component_detection/system.txt')
+    self.chain = self.llm | self.parser
+    
+  def label_components(self, base64_image: str) -> CircuitComponentsLLM:
+    print('invoking gpt4o to label circuit image')
+    msgs = [
+      SystemMessage(content=self.system_prompt),
+      HumanMessage(
+        content=[
+          {"type": "text", "text": self.format_instructions},
+          {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}},
+        ])
+    ]
+    components = self.chain.invoke(msgs)
+    print("got following response from vision llm: \n", components)
+    return components

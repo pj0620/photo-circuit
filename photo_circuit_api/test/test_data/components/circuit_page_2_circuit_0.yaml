@@ -1,0 +1,32 @@
+circuit_id: circuit_page_2_circuit_0
+components:
+- bbox:
+    h: 55
+    w: 55
+    x: 287
+    y: 88
+  component_name: resistor
+- bbox:
+    h: 50
+    w: 50
+    x: 433
+    y: 91
+  component_name: capacitor
+- bbox:
+    h: 60
+    w: 60
+    x: 360
+    y: 150
+  component_name: inductor
+- bbox:
+    h: 60
+    w: 60
+    x: 490
+    y: 152
+  component_name: dependant voltage source
+- bbox:
+    h: 50
+    w: 50
+    x: 186
+    y: 154
+  component_name: voltage source

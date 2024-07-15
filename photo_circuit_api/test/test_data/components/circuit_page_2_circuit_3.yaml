@@ -1,0 +1,38 @@
+circuit_id: circuit_page_2_circuit_3
+components:
+- bbox:
+    h: 60
+    w: 60
+    x: 297
+    y: 20
+  component_name: dependant current source
+- bbox:
+    h: 55
+    w: 55
+    x: 302
+    y: 100
+  component_name: resistor
+- bbox:
+    h: 55
+    w: 55
+    x: 375
+    y: 175
+  component_name: inductor
+- bbox:
+    h: 60
+    w: 60
+    x: 130
+    y: 177
+  component_name: resistor
+- bbox:
+    h: 50
+    w: 50
+    x: 220
+    y: 180
+  component_name: capacitor
+- bbox:
+    h: 50
+    w: 50
+    x: 35
+    y: 180
+  component_name: current source

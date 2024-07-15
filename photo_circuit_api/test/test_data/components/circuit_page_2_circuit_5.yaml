@@ -1,0 +1,38 @@
+circuit_id: circuit_page_2_circuit_5
+components:
+- bbox:
+    h: 60
+    w: 60
+    x: 190
+    y: 20
+  component_name: resistor
+- bbox:
+    h: 55
+    w: 55
+    x: 290
+    y: 25
+  component_name: inductor
+- bbox:
+    h: 60
+    w: 60
+    x: 120
+    y: 110
+  component_name: voltage source
+- bbox:
+    h: 60
+    w: 60
+    x: 540
+    y: 105
+  component_name: resistor
+- bbox:
+    h: 50
+    w: 50
+    x: 440
+    y: 110
+  component_name: capacitor
+- bbox:
+    h: 50
+    w: 50
+    x: 365
+    y: 110
+  component_name: current source

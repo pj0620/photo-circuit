@@ -1,0 +1,20 @@
+circuit_id: circuit_page_0_circuit_1
+components:
+- bbox:
+    h: 54
+    w: 54
+    x: 211
+    y: 11
+  component_name: resistor
+- bbox:
+    h: 54
+    w: 54
+    x: 109
+    y: 79
+  component_name: voltage source
+- bbox:
+    h: 54
+    w: 54
+    x: 311
+    y: 80
+  component_name: capacitor
