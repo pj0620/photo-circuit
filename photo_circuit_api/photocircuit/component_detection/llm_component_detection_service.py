@@ -1,12 +1,8 @@
-from typing import Any
-
 from langchain.output_parsers import YamlOutputParser
 from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain_openai import ChatOpenAI
 
-from photocircuit.component_detection.base_component_detection_service import BaseComponentDetectionService
-from photocircuit.component_detection.model.circuit_image import CircuitComponents, CircuitComponentsLLM
+from photocircuit.component_detection.model import CircuitComponents
 from photocircuit.utils.prompt_utils import load_prompt, generate_image_with_grid_base64
 
 
@@ -14,12 +10,12 @@ from photocircuit.utils.prompt_utils import load_prompt, generate_image_with_gri
 class LlmComponentDetectionService:
   def __init__(self):
     self.llm = ChatOpenAI(temperature=0, model="gpt-4o", max_tokens=1024)
-    self.parser = YamlOutputParser(pydantic_object=CircuitComponentsLLM)
+    self.parser = YamlOutputParser(pydantic_object=CircuitComponents)
     self.format_instructions = self.parser.get_format_instructions()
     self.system_prompt = load_prompt('component_detection/system.txt')
     self.chain = self.llm | self.parser
     
-  def label_components(self, base64_image: str, int_size: int) -> CircuitComponentsLLM:
+  def label_components(self, base64_image: str, int_size: int) -> CircuitComponents:
     print('adding gridlines')
     img_with_grid = generate_image_with_grid_base64(base64_image, int_size)
     

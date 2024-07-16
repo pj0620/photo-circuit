@@ -1,4 +1,4 @@
-from photocircuit.component_detection.model.circuit_image import ComponentName
+from photocircuit.component_detection.model import ComponentName
 
 COMP_COLOR_MAP = {
   ComponentName.UNKNOWN: 'grey',
