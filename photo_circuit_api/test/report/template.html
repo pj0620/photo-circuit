@@ -27,7 +27,7 @@
                 <th>Circuit ID</th>
                 <th>Test Image</th>
                 <th>Result Image</th>
-                <th>Overlap %</th>
+                <th>Avg Error(px)</th>
             </tr>
         </thead>
         <tbody>
@@ -36,7 +36,7 @@
                 <td>{{ result.circuit_id }}</td>
                 <td><img src="data:image/png;base64,{{ result.test_image }}" alt="Test Image" width="200"></td>
                 <td><img src="data:image/png;base64,{{ result.result_image }}" alt="Result Image" width="200"></td>
-                <td><p>{{ result.overlap }}</p></td>
+                <td><p>{{ result.avg_error }}</p></td>
             </tr>
             {% endfor %}
         </tbody>

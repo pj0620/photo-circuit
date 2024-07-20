@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 
+import numpy as np
 from pydantic.v1 import BaseModel, Field
 
 
@@ -16,12 +17,18 @@ class ComponentName(Enum):
   
 
 class ComponentPosition(BaseModel):
-  x: int = Field(description="x location of component")
-  y: int = Field(description="y location of component")
+  x: int = Field(description="x location of center of component")
+  y: int = Field(description="y location of center of component")
+  
+  def as_numpy(self):
+    return np.array([
+      self.x,
+      self.y
+    ])
   
   
 class Component(BaseModel):
-  position: ComponentPosition = Field(description="position of component in image")
+  position: ComponentPosition = Field(description="center of component in image")
   component_name: ComponentName = Field(description="name of component")
   
   

@@ -5,7 +5,7 @@ components:
     w: 50
     x: 95
     y: 50
-  component_name: voltage source
+  component_name: current source
 - bbox:
     h: 60
     w: 60

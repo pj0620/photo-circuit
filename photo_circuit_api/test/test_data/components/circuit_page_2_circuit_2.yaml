@@ -23,7 +23,7 @@ components:
     w: 60
     x: 524
     y: 90
-  component_name: inductor
+  component_name: resistor
 - bbox:
     h: 58
     w: 58

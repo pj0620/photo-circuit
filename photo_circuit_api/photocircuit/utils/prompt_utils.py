@@ -5,7 +5,8 @@ import cv2
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
-
+import matplotlib
+matplotlib.use('Agg')
 
 def load_prompt(prompt: str) -> str:
   with open('photocircuit/prompts/' + prompt) as f:
