@@ -1,9 +1,11 @@
 import base64
+import io
 import os
 from io import BytesIO
 
+import cv2
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import ImageDraw, ImageFont, Image
 from langchain.output_parsers import YamlOutputParser
 
 from photocircuit.component_detection.model import Component, CircuitComponents
@@ -111,14 +113,30 @@ def add_labels_to_image(base64_image: str, circuit_components: CircuitComponents
   return base64_encoded_result
 
 
-def scale_image(image, screen_size):
-  width, height = image.size
+def scale_image(image: np.array, screen_size: int) -> np.array:
+  width, height = image.shape
   max_dim = max(width, height)
   scaling_factor = screen_size / max_dim
-  new_size = (int(width * scaling_factor), int(height * scaling_factor))
-  resized_image = image.resize(new_size, Image.ANTIALIAS)
-  return resized_image
+  return cv2.resize(image, (0, 0), fx=scaling_factor, fy=scaling_factor, interpolation=cv2.INTER_LINEAR)
 
+
+def numpy_to_base64(array: np.ndarray) -> str:
+  # Convert the NumPy array to a PIL Image
+  image = Image.fromarray(array.astype('uint8'))
+  
+  # Create a bytes buffer for the image
+  buffer = io.BytesIO()
+  
+  # Save the image to the buffer in PNG format
+  image.save(buffer, format='PNG')
+  
+  # Get the byte data of the image
+  byte_data = buffer.getvalue()
+  
+  # Encode the byte data to a base64 string
+  base64_str = base64.b64encode(byte_data).decode('utf-8')
+  
+  return base64_str
 
 def get_worst_dist(loc: np.array, image_shape: tuple[int, ...]):
   image_shape_arr = np.array(image_shape)[:len(loc)]
@@ -131,8 +149,7 @@ def dist_weight(dist):
   return dist
 
 
-def rank_component_detection_err(ground_truth_comps: CircuitComponents, predicted_comps: CircuitComponents,
-                                 image_shape: tuple[int, ...]):
+def rank_component_detection_err(ground_truth_comps: CircuitComponents, predicted_comps: CircuitComponents):
   # either there is an extra component/missing component just give it a score of zero
   if len(ground_truth_comps.components) != len(predicted_comps.components):
     return float('inf')
@@ -198,22 +215,22 @@ def rank_component_detection(ground_truth_comps: CircuitComponents, predicted_co
   return percent_score
 
 
-def rank_component_detection_avg_err(ground_truth_comps: CircuitComponents, predicted_comps: CircuitComponents,
-                                     image_shape: tuple[int, ...]):
-  total_score = 0
-  total_locations = len(ground_truth_comps.components)
-  
-  # Create dictionaries for easier lookup
-  ground_truth_dict = {comp.component_name: comp.position.as_numpy() for comp in ground_truth_comps.components}
-  predicted_dict = {comp.component_name: comp.position.as_numpy() for comp in predicted_comps.components}
-  
-  for component_name, true_loc in ground_truth_dict.items():
-    if component_name in predicted_dict:
-      guessed_loc = predicted_dict[component_name]
-      distance = calculate_distance(guessed_loc, true_loc)
-      normalized_distance = distance / max_possible_distance
-      score = 1 / (1 + normalized_distance)  # Adding 1 to avoid division by zero
-      total_score += score
-  
-  percent_score = (total_score / total_locations) * 100
-  return percent_score
+# def rank_component_detection_avg_err(ground_truth_comps: CircuitComponents, predicted_comps: CircuitComponents,
+#                                      image_shape: tuple[int, ...]):
+#   total_score = 0
+#   total_locations = len(ground_truth_comps.components)
+#
+#   # Create dictionaries for easier lookup
+#   ground_truth_dict = {comp.component_name: comp.position.as_numpy() for comp in ground_truth_comps.components}
+#   predicted_dict = {comp.component_name: comp.position.as_numpy() for comp in predicted_comps.components}
+#
+#   for component_name, true_loc in ground_truth_dict.items():
+#     if component_name in predicted_dict:
+#       guessed_loc = predicted_dict[component_name]
+#       distance = calculate_distance(guessed_loc, true_loc)
+#       normalized_distance = distance / max_possible_distance
+#       score = 1 / (1 + normalized_distance)  # Adding 1 to avoid division by zero
+#       total_score += score
+#
+#   percent_score = (total_score / total_locations) * 100
+#   return percent_score

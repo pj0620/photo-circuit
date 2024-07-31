@@ -1,4 +1,5 @@
 import base64
+import os
 from io import BytesIO
 
 import cv2
@@ -8,8 +9,11 @@ from matplotlib import pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
 
+
 def load_prompt(prompt: str) -> str:
-  with open('photocircuit/prompts/' + prompt) as f:
+  current_file_path = os.path.abspath(__file__)
+  current_directory = os.path.dirname(current_file_path)
+  with open(f'{current_directory}/../prompts/{prompt}') as f:
     return f.read()
   
   

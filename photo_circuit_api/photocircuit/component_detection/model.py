@@ -34,4 +34,5 @@ class Component(BaseModel):
   
 class CircuitComponents(BaseModel):
   components: list[Component] = Field(description="list of components in this image")
+  
 
