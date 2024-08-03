@@ -57,6 +57,10 @@ def load_circuit_images_with_components() -> tuple[dict[str, str], dict[str, Cir
         circuits_with_components[circuit_id] = CircuitComponents(
           components=fixed_comps
         )
+        
+  common_ids = set(raw_images.keys()).intersection(circuits_with_components.keys())
+  raw_images = {k: v for k, v in raw_images.items() if k in common_ids}
+  circuits_with_components = {k: v for k, v in circuits_with_components.items() if k in common_ids}
   
   return raw_images, circuits_with_components
 

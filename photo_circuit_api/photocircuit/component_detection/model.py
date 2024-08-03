@@ -30,9 +30,12 @@ class ComponentPosition(BaseModel):
 class Component(BaseModel):
   position: ComponentPosition = Field(description="center of component in image")
   component_name: ComponentName = Field(description="name of component")
-  orientation: int = Field(description="angle from right direction of positive port in degress. For non-polar, choose any port as positive port."
-                                       "point to the right.",
-                           examples=[0, 90, 270])
+  orientation: int = Field(description="Angle (in degrees) from the right direction indicating where the wire "
+                                       "for the positive input enters the component. For non-polar elements, "
+                                       "any wire can be chosen as the positive input. An angle of 0 degrees means "
+                                       "the wire enters from the right, 90 degrees means it enters from the top, etc.",
+                           examples=[0, 90, 180, 270])
+  orientation_reasoning: str = Field(description="detailed description of choice for orientation", default=None)
 
 
 class CircuitComponents(BaseModel):

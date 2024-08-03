@@ -4,21 +4,7 @@ import numpy as np
 from photocircuit.preprocessing.base_preprocessing_service import BasePreprocessingService
 from photocircuit.utils.common import scale_image
 
-FIXED_SIZE = 500
-
-# sf = ( F*(1 + s//F) ) / s
-
-# s  F | sf
-# 1  5 | 5/1
-# 2  5 | 5/2
-# 3  5 | 5/3
-# 4  5 | 5/4
-# 5  5 | 5/5
-# 6  5 | 10/6
-# 7  5 | 10/7
-# 8  5 | 10/8
-# 9  5 | 10/9
-# 10 5 | 10/10
+FIXED_SIZE = 600
 
 
 class ScalingPreprocessingService(BasePreprocessingService):

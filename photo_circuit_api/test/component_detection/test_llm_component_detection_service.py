@@ -7,7 +7,9 @@ from PIL import Image
 
 from photocircuit.component_detection.llm_component_detection_service import LlmComponentDetectionService
 from photocircuit.component_detection.model import CircuitComponents, Component, ComponentPosition
+from photocircuit.preprocessing.composite_preprocessing_service import CompositePreprocessingService
 from photocircuit.preprocessing.scaling_preprocessing_service import ScalingPreprocessingService
+from photocircuit.preprocessing.thickness_preprocessing_service import ThicknessPreprocessingService
 from photocircuit.utils.common import base64_to_numpy, numpy_to_base64, scale_image
 from photocircuit.utils.component_detection import components_diff
 from test.component_detection.utils import dump_array_to_csv
@@ -22,17 +24,41 @@ from test.test_utils import load_circuit_images_with_components, add_labels_to_i
 class LlmComponentDetectionServiceTest(unittest.TestCase):
   def setUp(self):
     self.llm_component_detection_service = LlmComponentDetectionService()
-    self.scaling_preprocessing_service = ScalingPreprocessingService()
+    self.preprocessing_service = CompositePreprocessingService(
+      ScalingPreprocessingService()
+    )
     self.raw_images, self.circuits_components = load_circuit_images_with_components()
+    
+    # Preprocessing
+    # TODO: move to seperate file once more tests are made
+    self.preprocessed_images, self.preprocessed_circuits_comps = {}, {}
+    for circuit_id in self.raw_images.keys():
+      raw_circuit_arr = base64_to_numpy(self.raw_images[circuit_id])
+      preprocessed_circuit_arr = self.preprocessing_service.preprocess_image(raw_circuit_arr)
+      preprocessed_circuit_img = numpy_to_base64(preprocessed_circuit_arr)
+      self.preprocessed_images[circuit_id] = preprocessed_circuit_img
+      
+      raw_circuit_comps = self.circuits_components[circuit_id]
+      scale_factor = max(*preprocessed_circuit_arr.shape) / max(*raw_circuit_arr.shape)
+      self.preprocessed_circuits_comps[circuit_id] = CircuitComponents(components=[
+        Component(
+          position=ComponentPosition(
+            x=comp.position.x * scale_factor,
+            y=comp.position.y * scale_factor
+          ),
+          component_name=comp.component_name,
+          # TODO:
+          orientation=0
+        )
+        for comp in raw_circuit_comps.components
+      ])
     
   def test_one_circuit(self):
     test_circuit_id = 'circuit_page_0_circuit_1'
     circuit_comps = self.circuits_components[test_circuit_id]
-    raw_circuit_img = self.raw_images[test_circuit_id]
-    raw_circuit_arr = base64_to_numpy(raw_circuit_img)
-    preprocessed_circuit_arr = self.scaling_preprocessing_service.preprocess_image(raw_circuit_arr)
-    preprocessed_circuit_img = numpy_to_base64(preprocessed_circuit_arr)
-    circuit_comps_generated = self.llm_component_detection_service.label_components(preprocessed_circuit_img, 50)
+    preprocessed_circuit_img = self.preprocessed_images[test_circuit_id]
+    
+    circuit_comps_generated = self.llm_component_detection_service.label_components(preprocessed_circuit_img, 60)
     
     avg_error = rank_component_detection_err(
       ground_truth_comps=circuit_comps,
@@ -51,8 +77,8 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
     
     results: list[CircuitResult] = []
     for circuit_id in circuit_ids:
-      circuit_comps = self.circuits_components[circuit_id]
-      circuit_img = self.raw_images[circuit_id]
+      circuit_comps = self.preprocessed_circuits_comps[circuit_id]
+      circuit_img = self.preprocessed_images[circuit_id]
       
       expected_labeled = add_labels_to_image(
         base64_image=circuit_img,
@@ -91,9 +117,6 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
     
     screen_sizes = np.arange(500, 1000, 100).astype(np.int32)
     intv_sizes = np.arange(5, 105, 5).astype(np.int32)
-    
-    # screen_sizes = np.arange(500, 600, 100).astype(np.int32)
-    # intv_sizes = np.arange(10, 20, 10).astype(np.int32)
     
     # Convert image to a NumPy array
     image_data = base64.b64decode(circuit_img)
