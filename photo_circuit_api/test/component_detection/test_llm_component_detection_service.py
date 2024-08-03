@@ -4,6 +4,7 @@ from io import BytesIO
 
 import numpy as np
 from PIL import Image
+from dotenv import load_dotenv
 
 from photocircuit.component_detection.llm_component_detection_service import LlmComponentDetectionService
 from photocircuit.component_detection.model import CircuitComponents, Component, ComponentPosition
@@ -23,6 +24,8 @@ from test.test_utils import load_circuit_images_with_components, add_labels_to_i
 # Define class to test the program
 class LlmComponentDetectionServiceTest(unittest.TestCase):
   def setUp(self):
+    load_dotenv()
+    
     self.llm_component_detection_service = LlmComponentDetectionService()
     self.preprocessing_service = CompositePreprocessingService(
       ScalingPreprocessingService()
@@ -85,7 +88,7 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
         circuit_components=circuit_comps
       )
   
-      circuit_comps_generated = self.llm_component_detection_service.label_components(circuit_img, 60)
+      circuit_comps_generated = self.llm_component_detection_service.label_components(circuit_img, 50)
       generated_labeled = add_labels_to_image(
         base64_image=circuit_img,
         circuit_components=circuit_comps_generated
