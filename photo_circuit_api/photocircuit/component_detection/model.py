@@ -14,7 +14,7 @@ class ComponentName(Enum):
   DEPENDANT_VOLTAGE_SOURCE = 'dependant voltage source'
   DEPENDANT_CURRENT_SOURCE = 'dependant current source'
   UNKNOWN = 'unknown'
-  
+
 
 class ComponentPosition(BaseModel):
   x: int = Field(description="x location of center of component")
@@ -25,14 +25,16 @@ class ComponentPosition(BaseModel):
       self.x,
       self.y
     ])
-  
-  
+
+
 class Component(BaseModel):
   position: ComponentPosition = Field(description="center of component in image")
   component_name: ComponentName = Field(description="name of component")
-  
-  
+  orientation: int = Field(description="direction of positive terminal for this element in degrees. For non-polar "
+                                       "elements choose any port as the positive port. Zero degrees is equivalent to "
+                                       "point to the right.",
+                           examples=[0, 90, 270])
+
+
 class CircuitComponents(BaseModel):
   components: list[Component] = Field(description="list of components in this image")
-  
-

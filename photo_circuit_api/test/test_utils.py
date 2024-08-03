@@ -49,7 +49,8 @@ def load_circuit_images_with_components() -> tuple[dict[str, str], dict[str, Cir
         fixed_comps = [
           Component(
             position=bbox_center(comp_with_bbox.bbox),
-            component_name=comp_with_bbox.component_name
+            component_name=comp_with_bbox.component_name,
+            orientation=0
           )
           for comp_with_bbox in circuit_components.components
         ]

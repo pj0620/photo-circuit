@@ -13,6 +13,7 @@ from photocircuit.utils.component_detection import components_diff
 from test.component_detection.utils import dump_array_to_csv
 from test.report.model import CircuitResult
 from test.report.report import generate_report
+from test.report.utils import get_generated_circuit
 from test.test_utils import load_circuit_images_with_components, add_labels_to_image, rank_component_detection, \
   rank_component_detection_err, scale_image, numpy_to_base64
 
@@ -22,6 +23,16 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
   def setUp(self):
     self.llm_component_detection_service = LlmComponentDetectionService()
     self.raw_images, self.circuits_components = load_circuit_images_with_components()
+    
+  def test_all_fields_populated(self):
+    test_circuit_id = 'circuit_page_1_circuit_0'
+    circuit_comps = self.circuits_components[test_circuit_id]
+    circuit_img = self.raw_images[test_circuit_id]
+    circuit_comps_generated = self.llm_component_detection_service.label_components(circuit_img, 60)
+    print(circuit_comps_generated)
+    
+    circuit_img = get_generated_circuit(circuit_comps_generated)
+    circuit_img.show(test_circuit_id)
   
   # Function to test addition function
   def test_detection(self):
