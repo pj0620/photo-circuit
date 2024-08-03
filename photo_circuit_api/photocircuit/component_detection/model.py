@@ -30,8 +30,7 @@ class ComponentPosition(BaseModel):
 class Component(BaseModel):
   position: ComponentPosition = Field(description="center of component in image")
   component_name: ComponentName = Field(description="name of component")
-  orientation: int = Field(description="direction of positive terminal for this element in degrees. For non-polar "
-                                       "elements choose any port as the positive port. Zero degrees is equivalent to "
+  orientation: int = Field(description="angle from right direction of positive port in degress. For non-polar, choose any port as positive port."
                                        "point to the right.",
                            examples=[0, 90, 270])
 

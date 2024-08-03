@@ -5,17 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Circuit Test Results</title>
     <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #ffffff;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
         }
         th, td {
-            border: 1px solid black;
+            border: 1px solid #333333;
             padding: 8px;
             text-align: center;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #333333;
+        }
+        td {
+            background-color: #1e1e1e;
+        }
+        img {
+            border: 1px solid #444444;
+        }
+        p {
+            margin: 0;
         }
     </style>
 </head>
@@ -27,6 +44,7 @@
                 <th>Circuit ID</th>
                 <th>Test Image</th>
                 <th>Result Image</th>
+                <th>Oriented Image</th>
                 <th>Avg Error(px)</th>
             </tr>
         </thead>
@@ -36,6 +54,7 @@
                 <td>{{ result.circuit_id }}</td>
                 <td><img src="data:image/png;base64,{{ result.test_image }}" alt="Test Image" width="200"></td>
                 <td><img src="data:image/png;base64,{{ result.result_image }}" alt="Result Image" width="200"></td>
+                <td><img src="data:image/png;base64,{{ result.oriented_img }}" alt="Oriented Result" width="200"></td>
                 <td><p>{{ result.avg_error }}</p></td>
             </tr>
             {% endfor %}

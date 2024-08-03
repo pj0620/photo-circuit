@@ -2,8 +2,6 @@ import base64
 import unittest
 from io import BytesIO
 
-import cv2
-import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
@@ -13,9 +11,10 @@ from photocircuit.utils.component_detection import components_diff
 from test.component_detection.utils import dump_array_to_csv
 from test.report.model import CircuitResult
 from test.report.report import generate_report
-from test.report.utils import get_generated_circuit
-from test.test_utils import load_circuit_images_with_components, add_labels_to_image, rank_component_detection, \
-  rank_component_detection_err, scale_image, numpy_to_base64
+from test.report.utils import get_generated_circuit, get_base64_png, get_image_from_base64, \
+  merge_images_vertically
+from test.test_utils import load_circuit_images_with_components, add_labels_to_image, rank_component_detection_err, \
+  scale_image, numpy_to_base64
 
 
 # Define class to test the program
@@ -24,15 +23,22 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
     self.llm_component_detection_service = LlmComponentDetectionService()
     self.raw_images, self.circuits_components = load_circuit_images_with_components()
     
-  def test_all_fields_populated(self):
-    test_circuit_id = 'circuit_page_1_circuit_0'
+  def test_one_circuit(self):
+    test_circuit_id = 'circuit_page_0_circuit_1'
     circuit_comps = self.circuits_components[test_circuit_id]
     circuit_img = self.raw_images[test_circuit_id]
     circuit_comps_generated = self.llm_component_detection_service.label_components(circuit_img, 60)
-    print(circuit_comps_generated)
     
-    circuit_img = get_generated_circuit(circuit_comps_generated)
-    circuit_img.show(test_circuit_id)
+    avg_error = rank_component_detection_err(
+      ground_truth_comps=circuit_comps,
+      predicted_comps=circuit_comps_generated
+    )
+    print(f'avg_error: {avg_error}')
+    
+    generated_circuit_img = get_generated_circuit(circuit_comps_generated)
+    
+    merged_img = merge_images_vertically(generated_circuit_img, get_image_from_base64(circuit_img))
+    merged_img.show()
   
   # Function to test addition function
   def test_detection(self):
@@ -53,6 +59,7 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
         base64_image=circuit_img,
         circuit_components=circuit_comps_generated
       )
+      generated_orientation_img = get_base64_png(get_generated_circuit(circuit_comps_generated))
 
       avg_error = rank_component_detection_err(
         ground_truth_comps=circuit_comps,
@@ -64,6 +71,7 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
           circuit_id=circuit_id,
           test_image=expected_labeled,
           result_image=generated_labeled,
+          oriented_img=generated_orientation_img,
           avg_error="{:.2f}".format(avg_error)
         )
       )
