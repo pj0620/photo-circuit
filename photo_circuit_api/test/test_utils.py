@@ -114,31 +114,6 @@ def add_labels_to_image(base64_image: str, circuit_components: CircuitComponents
   return base64_encoded_result
 
 
-def scale_image(image: np.array, screen_size: int) -> np.array:
-  width, height = image.shape
-  max_dim = max(width, height)
-  scaling_factor = screen_size / max_dim
-  return cv2.resize(image, (0, 0), fx=scaling_factor, fy=scaling_factor, interpolation=cv2.INTER_LINEAR)
-
-
-def numpy_to_base64(array: np.ndarray) -> str:
-  # Convert the NumPy array to a PIL Image
-  image = Image.fromarray(array.astype('uint8'))
-  
-  # Create a bytes buffer for the image
-  buffer = io.BytesIO()
-  
-  # Save the image to the buffer in PNG format
-  image.save(buffer, format='PNG')
-  
-  # Get the byte data of the image
-  byte_data = buffer.getvalue()
-  
-  # Encode the byte data to a base64 string
-  base64_str = base64.b64encode(byte_data).decode('utf-8')
-  
-  return base64_str
-
 def get_worst_dist(loc: np.array, image_shape: tuple[int, ...]):
   image_shape_arr = np.array(image_shape)[:len(loc)]
   combined_dists = np.array([loc, image_shape_arr - loc])

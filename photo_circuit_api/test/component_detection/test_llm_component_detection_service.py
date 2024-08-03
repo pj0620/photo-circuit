@@ -7,27 +7,32 @@ from PIL import Image
 
 from photocircuit.component_detection.llm_component_detection_service import LlmComponentDetectionService
 from photocircuit.component_detection.model import CircuitComponents, Component, ComponentPosition
+from photocircuit.preprocessing.scaling_preprocessing_service import ScalingPreprocessingService
+from photocircuit.utils.common import base64_to_numpy, numpy_to_base64, scale_image
 from photocircuit.utils.component_detection import components_diff
 from test.component_detection.utils import dump_array_to_csv
 from test.report.model import CircuitResult
 from test.report.report import generate_report
 from test.report.utils import get_generated_circuit, get_base64_png, get_image_from_base64, \
   merge_images_vertically
-from test.test_utils import load_circuit_images_with_components, add_labels_to_image, rank_component_detection_err, \
-  scale_image, numpy_to_base64
+from test.test_utils import load_circuit_images_with_components, add_labels_to_image, rank_component_detection_err
 
 
 # Define class to test the program
 class LlmComponentDetectionServiceTest(unittest.TestCase):
   def setUp(self):
     self.llm_component_detection_service = LlmComponentDetectionService()
+    self.scaling_preprocessing_service = ScalingPreprocessingService()
     self.raw_images, self.circuits_components = load_circuit_images_with_components()
     
   def test_one_circuit(self):
     test_circuit_id = 'circuit_page_0_circuit_1'
     circuit_comps = self.circuits_components[test_circuit_id]
-    circuit_img = self.raw_images[test_circuit_id]
-    circuit_comps_generated = self.llm_component_detection_service.label_components(circuit_img, 60)
+    raw_circuit_img = self.raw_images[test_circuit_id]
+    raw_circuit_arr = base64_to_numpy(raw_circuit_img)
+    preprocessed_circuit_arr = self.scaling_preprocessing_service.preprocess_image(raw_circuit_arr)
+    preprocessed_circuit_img = numpy_to_base64(preprocessed_circuit_arr)
+    circuit_comps_generated = self.llm_component_detection_service.label_components(preprocessed_circuit_img, 50)
     
     avg_error = rank_component_detection_err(
       ground_truth_comps=circuit_comps,
@@ -37,7 +42,7 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
     
     generated_circuit_img = get_generated_circuit(circuit_comps_generated)
     
-    merged_img = merge_images_vertically(generated_circuit_img, get_image_from_base64(circuit_img))
+    merged_img = merge_images_vertically(generated_circuit_img, get_image_from_base64(preprocessed_circuit_img))
     merged_img.show()
   
   # Function to test addition function
