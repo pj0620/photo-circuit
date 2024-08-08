@@ -15,9 +15,9 @@ class LlmComponentDetectionService:
     self.system_prompt = load_prompt('component_detection/system.txt')
     self.chain = self.llm | self.parser
     
-  def label_components(self, base64_image: str, int_size: int) -> CircuitComponents:
+  def label_components(self, base64_image: str, int_size: int, include_grid: bool) -> CircuitComponents:
     print('adding gridlines')
-    img_with_grid = generate_image_with_grid_base64(base64_image, int_size)
+    img_with_grid = generate_image_with_grid_base64(base64_image, int_size, include_grid)
     
     print('invoking gpt4o to label circuit image')
     msgs = [

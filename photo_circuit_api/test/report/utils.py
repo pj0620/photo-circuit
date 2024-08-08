@@ -41,7 +41,7 @@ def get_generated_circuit(circuit_components: CircuitComponents):
     component_image = Image.open(get_image_path_for_comp(component.component_name))
     
     # Rotate the image according to its orientation
-    rotated_image = component_image.rotate(component.orientation - 90, expand=True)
+    rotated_image = component_image.rotate(component.positive_input_direction - 90, expand=True)
     
     # Calculate the top-left corner position
     x, y = component.position.x, component.position.y

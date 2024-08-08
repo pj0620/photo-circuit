@@ -51,17 +51,20 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
           ),
           component_name=comp.component_name,
           # TODO:
-          orientation=0
+          positive_input_direction=0
         )
         for comp in raw_circuit_comps.components
       ])
     
   def test_one_circuit(self):
-    test_circuit_id = 'circuit_page_0_circuit_1'
-    circuit_comps = self.circuits_components[test_circuit_id]
+    test_circuit_id = 'circuit_page_2_circuit_0'
+    circuit_comps = self.preprocessed_circuits_comps[test_circuit_id]
     preprocessed_circuit_img = self.preprocessed_images[test_circuit_id]
     
-    circuit_comps_generated = self.llm_component_detection_service.label_components(preprocessed_circuit_img, 60)
+    circuit_img_arr = base64_to_numpy(preprocessed_circuit_img)
+    max_len = max(*circuit_img_arr.shape)
+    int_size = 50 if max_len <= 500 else 100
+    circuit_comps_generated = self.llm_component_detection_service.label_components(preprocessed_circuit_img, int_size)
     
     avg_error = rank_component_detection_err(
       ground_truth_comps=circuit_comps,
@@ -83,12 +86,10 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
       circuit_comps = self.preprocessed_circuits_comps[circuit_id]
       circuit_img = self.preprocessed_images[circuit_id]
       
-      expected_labeled = add_labels_to_image(
-        base64_image=circuit_img,
-        circuit_components=circuit_comps
-      )
-  
-      circuit_comps_generated = self.llm_component_detection_service.label_components(circuit_img, 50)
+      circuit_img_arr = base64_to_numpy(circuit_img)
+      max_len = max(*circuit_img_arr.shape)
+      int_size = 50 if max_len <= 500 else 100
+      circuit_comps_generated = self.llm_component_detection_service.label_components(circuit_img, int_size)
       generated_labeled = add_labels_to_image(
         base64_image=circuit_img,
         circuit_components=circuit_comps_generated
@@ -103,7 +104,7 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
       results.append(
         CircuitResult(
           circuit_id=circuit_id,
-          test_image=expected_labeled,
+          test_image=circuit_img,
           result_image=generated_labeled,
           oriented_img=generated_orientation_img,
           avg_error="{:.2f}".format(avg_error)
@@ -113,13 +114,19 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
     generate_report(circuit_results=results)
     
   def test_image_size(self):
+    # Medium
     test_circuit_id = "circuit_page_2_circuit_3"
+    
+    ## Large
+    # test_circuit_id = "circuit_page_2_circuit_4"
     
     circuit_comps = self.circuits_components[test_circuit_id]
     circuit_img = self.raw_images[test_circuit_id]
     
     screen_sizes = np.arange(500, 1000, 100).astype(np.int32)
     intv_sizes = np.arange(5, 105, 5).astype(np.int32)
+    # screen_sizes = np.arange(500, 600, 100).astype(np.int32)
+    # intv_sizes = np.arange(5, 10, 5).astype(np.int32)
     
     # Convert image to a NumPy array
     image_data = base64.b64decode(circuit_img)
@@ -128,6 +135,7 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
     
     max_len = max(image_array.shape)
     res = []
+    includes_grid = False
     for i, screen_size in enumerate(screen_sizes):
       scale_factor = screen_size / max_len
       circuit_comps_scaled = CircuitComponents(components=[
@@ -136,7 +144,8 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
             x=comp.position.x * scale_factor,
             y=comp.position.y * scale_factor
           ),
-          component_name=comp.component_name
+          component_name=comp.component_name,
+          positive_input_direction=0
         )
         for comp in circuit_comps.components
       ])
@@ -149,7 +158,8 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
         print(scaled_circuit_img)
         circuit_comps_generated = self.llm_component_detection_service.label_components(
           scaled_circuit_img,
-          intv_size
+          intv_size,
+          includes_grid
         )
         
         avg_error = rank_component_detection_err(
@@ -166,11 +176,11 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
           print(diff_msg)
         
         res.append(
-          [test_circuit_id, max_len, screen_sizes[i], intv_sizes[j], avg_error]
+          ["true" if includes_grid else "false", test_circuit_id, max_len, screen_sizes[i], intv_sizes[j], avg_error]
         )
   
     print(res)
-    header = ["Circuit Id", "Original Size(px)", "Screen Size (px)", "Interval Size (px)", "Average Error (px)"]
+    header = ["Includes Grid", "Circuit Id", "Original Size(px)", "Screen Size (px)", "Interval Size (px)", "Average Error (px)"]
     dump_array_to_csv(res, 'screen_sizes_intv_spacing.csv', header=header)
 
 

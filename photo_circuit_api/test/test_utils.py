@@ -50,7 +50,7 @@ def load_circuit_images_with_components() -> tuple[dict[str, str], dict[str, Cir
           Component(
             position=bbox_center(comp_with_bbox.bbox),
             component_name=comp_with_bbox.component_name,
-            orientation=0
+            positive_input_direction=0
           )
           for comp_with_bbox in circuit_components.components
         ]

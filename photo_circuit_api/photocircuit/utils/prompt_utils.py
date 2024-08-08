@@ -17,7 +17,7 @@ def load_prompt(prompt: str) -> str:
     return f.read()
   
   
-def generate_image_with_grid_base64(input_base64: str, step_size: int) -> str:
+def generate_image_with_grid_base64(input_base64: str, step_size: int, include_grid: bool = True) -> str:
   """
   Decodes a base64 encoded PNG, generates an image with a grid overlay,
   and returns it as a base64 encoded PNG.
@@ -50,7 +50,8 @@ def generate_image_with_grid_base64(input_base64: str, step_size: int) -> str:
   ax.set_yticks(np.arange(0, image_array.shape[0], y_step_size))
   
   # Grid lines based on major ticks
-  ax.grid(which='both', color='gray', linestyle='-', linewidth=0.5)
+  if include_grid:
+    ax.grid(which='both', color='gray', linestyle='-', linewidth=0.5)
   
   # Optionally add labels to major ticks
   ax.set_xticklabels(np.arange(0, image_array.shape[1], x_step_size))
