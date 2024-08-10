@@ -66,5 +66,3 @@ def generate_image_with_grid_base64(input_base64: str, step_size: int, include_g
   output_base64 = base64.b64encode(buf.read()).decode('utf-8')
   return output_base64
 
-  # plt.show()
-  # return ""

@@ -182,6 +182,30 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
     print(res)
     header = ["Includes Grid", "Circuit Id", "Original Size(px)", "Screen Size (px)", "Interval Size (px)", "Average Error (px)"]
     dump_array_to_csv(res, 'screen_sizes_intv_spacing.csv', header=header)
+    
+  def test_model_temperature(self):
+    test_circuit_id = "circuit_page_2_circuit_4"
+    circuit_comps = self.preprocessed_circuits_comps[test_circuit_id]
+    circuit_img = self.preprocessed_images[test_circuit_id]
+    circuit_img_arr = base64_to_numpy(circuit_img)
+    max_len = max(*circuit_img_arr.shape)
+    int_size = 50 if max_len <= 500 else 100
+    temps = np.arange(0.075, 1, 0.1)
+    for _ in range(7):
+      res = []
+      for temp in temps:
+        llm_component_detection_service = LlmComponentDetectionService(temp)
+        circuit_comps_generated = llm_component_detection_service.label_components(circuit_img,
+                                                                                        int_size)
+        avg_error = rank_component_detection_err(
+          ground_truth_comps=circuit_comps,
+          predicted_comps=circuit_comps_generated
+        )
+        print(f'avg_error: {avg_error}')
+        
+        res.append([test_circuit_id, temp, avg_error])
+      header = ["Circuit Id", "Temperature", "Average Error (px)"]
+      dump_array_to_csv(res, 'temp_errors.csv', header=header)
 
 
 if __name__ == '__main__':

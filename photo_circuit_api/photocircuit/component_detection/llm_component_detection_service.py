@@ -8,14 +8,14 @@ from photocircuit.utils.prompt_utils import load_prompt, generate_image_with_gri
 
 # class LlmComponentDetectionService(BaseComponentDetectionService):
 class LlmComponentDetectionService:
-  def __init__(self):
-    self.llm = ChatOpenAI(temperature=0, model="gpt-4o", max_tokens=1024)
+  def __init__(self, temperature: float = 0):
+    self.llm = ChatOpenAI(temperature=temperature, model="gpt-4o", max_tokens=1024)
     self.parser = YamlOutputParser(pydantic_object=CircuitComponents)
     self.format_instructions = self.parser.get_format_instructions()
     self.system_prompt = load_prompt('component_detection/system.txt')
     self.chain = self.llm | self.parser
     
-  def label_components(self, base64_image: str, int_size: int, include_grid: bool) -> CircuitComponents:
+  def label_components(self, base64_image: str, int_size: int, include_grid: bool = True) -> CircuitComponents:
     print('adding gridlines')
     img_with_grid = generate_image_with_grid_base64(base64_image, int_size, include_grid)
     
