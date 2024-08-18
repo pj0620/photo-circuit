@@ -12,7 +12,7 @@ class LlmComponentDetectionService:
     self.llm = ChatOpenAI(temperature=temperature, model="gpt-4o", max_tokens=1024)
     self.parser = YamlOutputParser(pydantic_object=CircuitComponents)
     self.format_instructions = self.parser.get_format_instructions()
-    self.system_prompt = load_prompt('component_detection/system.txt')
+    self.system_prompt = load_prompt('llm_component_detection/system.txt')
     self.chain = self.llm | self.parser
     
   def label_components(self, base64_image: str, int_size: int, include_grid: bool = True) -> CircuitComponents:

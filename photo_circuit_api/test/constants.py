@@ -10,3 +10,7 @@ COMP_COLOR_MAP = {
   ComponentName.DEPENDANT_VOLTAGE_SOURCE: 'navy',
   ComponentName.DEPENDANT_CURRENT_SOURCE: 'olive',
 }
+
+SMALL_CIRCUIT_ID = 'circuit_page_1_circuit_2'
+MEDIUM_CIRCUIT_ID = 'circuit_page_2_circuit_3'
+LARGE_CIRCUIT_ID = 'circuit_page_2_circuit_4'

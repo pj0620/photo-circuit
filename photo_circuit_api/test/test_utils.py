@@ -8,7 +8,7 @@ import numpy as np
 from PIL import ImageDraw, ImageFont, Image
 from langchain.output_parsers import YamlOutputParser
 
-from photocircuit.component_detection.model import Component, CircuitComponents
+from photocircuit.component_detection.model import Component, CircuitComponents, SizedCircuitComponents
 from test.component_detection.model import TestDataCircuitComponents
 from test.component_detection.utils import bbox_center
 from test.constants import COMP_COLOR_MAP
@@ -193,6 +193,61 @@ def rank_component_detection(ground_truth_comps: CircuitComponents, predicted_co
   
   percent_score = (total_score / total_locations) * 100
   return percent_score
+  
+  
+def add_labels_and_bboxs_to_image(base64_image: str, circuit_components: SizedCircuitComponents) -> str:
+  # Decode the base64 image
+  image_data = base64.b64decode(base64_image)
+  image = Image.open(BytesIO(image_data)).convert("RGB")
+  
+  # Initialize ImageDraw
+  draw = ImageDraw.Draw(image)
+  
+  # Define a font
+  try:
+    font = ImageFont.truetype("arial.ttf", 16)
+  except IOError:
+    font = ImageFont.load_default(12)
+  
+  # Add text labels and bounding boxes to the image
+  for component in circuit_components.sized_components:
+    position = component.position
+    text = component.component_name.value
+    approximate_size = component.approximate_size
+    
+    # Calculate text size and background size using textbbox
+    text_bbox = draw.textbbox((0, 0), text, font=font)
+    text_size = (text_bbox[2] - text_bbox[0], text_bbox[3] - text_bbox[1])
+    background_size = (text_size[0] + 4, text_size[1] + 4)
+    
+    # Calculate background position
+    background_position = (position.x - background_size[0] // 2, position.y - background_size[1] // 2)
+    background_rect = [background_position,
+                       (background_position[0] + background_size[0], background_position[1] + background_size[1])]
+    
+    # Draw the background rectangle
+    draw.rectangle(background_rect, fill=get_background_color(component.component_name))
+    
+    # Calculate text position
+    text_position = (position.x - text_size[0] // 2, position.y - text_size[1] // 2)
+    
+    # Draw the text
+    draw.text(text_position, text, fill="white", font=font)
+    
+    # Draw the bounding box
+    bbox_top_left = (position.x - approximate_size // 2, position.y - approximate_size // 2)
+    bbox_bottom_right = (position.x + approximate_size // 2, position.y + approximate_size // 2)
+    draw.rectangle([bbox_top_left, bbox_bottom_right], outline="red", width=2)
+  
+  # Save the edited image to a BytesIO object
+  output_buffer = BytesIO()
+  image.save(output_buffer, format="PNG")
+  byte_data = output_buffer.getvalue()
+  
+  # Encode the image back to base64
+  base64_encoded_result = base64.b64encode(byte_data).decode('utf-8')
+  
+  return base64_encoded_result
 
 
 # def rank_component_detection_avg_err(ground_truth_comps: CircuitComponents, predicted_comps: CircuitComponents,

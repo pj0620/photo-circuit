@@ -10,18 +10,15 @@ from photocircuit.component_detection.llm_component_detection_service import Llm
 from photocircuit.component_detection.model import CircuitComponents, Component, ComponentPosition
 from photocircuit.preprocessing.composite_preprocessing_service import CompositePreprocessingService
 from photocircuit.preprocessing.scaling_preprocessing_service import ScalingPreprocessingService
-from photocircuit.preprocessing.thickness_preprocessing_service import ThicknessPreprocessingService
 from photocircuit.utils.common import base64_to_numpy, numpy_to_base64, scale_image
 from photocircuit.utils.component_detection import components_diff
 from test.component_detection.utils import dump_array_to_csv
 from test.report.model import CircuitResult
 from test.report.report import generate_report
-from test.report.utils import get_generated_circuit, get_base64_png, get_image_from_base64, \
-  merge_images_vertically
+from test.report.utils import get_generated_circuit, get_base64_png, get_image_from_base64, merge_images_vertically
 from test.test_utils import load_circuit_images_with_components, add_labels_to_image, rank_component_detection_err
 
 
-# Define class to test the program
 class LlmComponentDetectionServiceTest(unittest.TestCase):
   def setUp(self):
     load_dotenv()
@@ -33,7 +30,7 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
     self.raw_images, self.circuits_components = load_circuit_images_with_components()
     
     # Preprocessing
-    # TODO: move to seperate file once more tests are made
+    # TODO: move to separate file once more tests are made
     self.preprocessed_images, self.preprocessed_circuits_comps = {}, {}
     for circuit_id in self.raw_images.keys():
       raw_circuit_arr = base64_to_numpy(self.raw_images[circuit_id])

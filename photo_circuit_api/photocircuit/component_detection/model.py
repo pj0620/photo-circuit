@@ -28,7 +28,7 @@ class ComponentPosition(BaseModel):
 
 
 class Component(BaseModel):
-  position: ComponentPosition = Field(description="center of component in image")
+  position: ComponentPosition = Field(description="exact center of component")
   component_name: ComponentName = Field(description="name of component")
   positive_input_direction: int = Field(
     description="Angle (in degrees) for the positive terminal of the component. For non-polar elements, any wire "
@@ -41,5 +41,13 @@ class Component(BaseModel):
   )
 
 
+class SizedComponent(Component):
+  approximate_size: int = Field(description="side length of square that is big enough to fit entire component.")
+
+
+class SizedCircuitComponents(BaseModel):
+  sized_components: list[SizedComponent] = Field(description="list of components with size in the image")
+
+
 class CircuitComponents(BaseModel):
-  components: list[Component] = Field(description="list of components in this image")
+  components: list[Component] = Field(description="list of components in the image")

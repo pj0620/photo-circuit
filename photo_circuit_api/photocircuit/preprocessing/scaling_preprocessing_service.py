@@ -10,7 +10,8 @@ FIXED_SIZE = 600
 class ScalingPreprocessingService(BasePreprocessingService):
   def preprocess_image(self, image_arr: np.array) -> np.array:
     max_side_len = max(image_arr.shape)
-    scale_factor = (FIXED_SIZE * (1 + max_side_len // FIXED_SIZE)) / max_side_len
+    # scale_factor = (FIXED_SIZE * (1 + max_side_len // FIXED_SIZE)) / max_side_len
+    scale_factor = FIXED_SIZE / max_side_len
     scaled_circuit_img_arr = cv2.resize(
       image_arr,
       (0, 0),
