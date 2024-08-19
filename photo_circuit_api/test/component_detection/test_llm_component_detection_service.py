@@ -48,7 +48,8 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
           ),
           component_name=comp.component_name,
           # TODO:
-          positive_input_direction=0
+          positive_input_direction=0,
+          id="T"
         )
         for comp in raw_circuit_comps.components
       ])
@@ -57,11 +58,8 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
     test_circuit_id = 'circuit_page_2_circuit_0'
     circuit_comps = self.preprocessed_circuits_comps[test_circuit_id]
     preprocessed_circuit_img = self.preprocessed_images[test_circuit_id]
-    
-    circuit_img_arr = base64_to_numpy(preprocessed_circuit_img)
-    max_len = max(*circuit_img_arr.shape)
-    int_size = 50 if max_len <= 500 else 100
-    circuit_comps_generated = self.llm_component_detection_service.label_components(preprocessed_circuit_img, int_size)
+    circuit_comps_generated = self.llm_component_detection_service.label_components(preprocessed_circuit_img, 75)
+    print("generated comps: ", circuit_comps_generated)
     
     avg_error = rank_component_detection_err(
       ground_truth_comps=circuit_comps,

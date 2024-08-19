@@ -4,7 +4,7 @@ import numpy as np
 from photocircuit.preprocessing.base_preprocessing_service import BasePreprocessingService
 from photocircuit.utils.common import scale_image
 
-FIXED_SIZE = 600
+FIXED_SIZE = 750
 
 
 class ScalingPreprocessingService(BasePreprocessingService):

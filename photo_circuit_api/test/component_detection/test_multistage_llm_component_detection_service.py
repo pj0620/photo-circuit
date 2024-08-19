@@ -53,7 +53,8 @@ class LlmComponentDetectionServiceTest(unittest.TestCase):
           ),
           component_name=comp.component_name,
           # TODO:
-          positive_input_direction=0
+          positive_input_direction=0,
+          id="T"
         )
         for comp in raw_circuit_comps.components
       ])

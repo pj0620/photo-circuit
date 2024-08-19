@@ -39,6 +39,11 @@ class Component(BaseModel):
     description="detailed description of choice for positive_input_direction",
     default=None
   )
+  id: str = Field(description="unique id of component", examples=["C1", "R4", "L1"])
+
+
+class CircuitComponents(BaseModel):
+  components: list[Component] = Field(description="list of components in the image")
 
 
 class SizedComponent(Component):
@@ -48,6 +53,3 @@ class SizedComponent(Component):
 class SizedCircuitComponents(BaseModel):
   sized_components: list[SizedComponent] = Field(description="list of components with size in the image")
 
-
-class CircuitComponents(BaseModel):
-  components: list[Component] = Field(description="list of components in the image")

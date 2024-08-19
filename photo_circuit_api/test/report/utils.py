@@ -3,7 +3,7 @@ import io
 import os
 from io import BytesIO
 
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
 from matplotlib import pyplot as plt
 
 from photocircuit.component_detection.model import ComponentName, Component, CircuitComponents
@@ -26,7 +26,7 @@ def get_image_path_for_comp(component_name: ComponentName):
   return f'{test_data_dir}/{comp_filename}'
 
 
-def get_generated_circuit(circuit_components: CircuitComponents):
+def get_generated_circuit(circuit_components: CircuitComponents, include_ids=True):
   canvas_width = max(c.position.x for c in circuit_components.components)
   canvas_height = max(c.position.y for c in circuit_components.components)
   
@@ -35,6 +35,13 @@ def get_generated_circuit(circuit_components: CircuitComponents):
   
   # Create a blank canvas
   final_image = Image.new('RGB', (canvas_width, canvas_height), (255, 255, 255))
+  draw = ImageDraw.Draw(final_image)
+  
+  # Optionally load a font
+  try:
+    font = ImageFont.truetype("arial.ttf", 16)
+  except IOError:
+    font = ImageFont.load_default()
   
   for component in circuit_components.components:
     # Load the component image
@@ -50,9 +57,13 @@ def get_generated_circuit(circuit_components: CircuitComponents):
     
     # Paste the rotated image onto the final image
     final_image.paste(rotated_image, (top_left_x, top_left_y), rotated_image)
+    
+    if include_ids:
+      # Draw the component ID text to the left of the component
+      text_position = (top_left_x - 20, top_left_y + rotated_image.height // 2 - 10)
+      draw.text(text_position, str(component.id), fill=(0, 0, 0), font=font)
   
   return final_image
-  
   
 def get_base64_png(circuit_image: Image.Image) -> str:
   # Create a buffer to save the image
